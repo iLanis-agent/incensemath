@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Incense math - calculators</title>
+<style>
+  :root { --accent: #6e6a75; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #f7f7f9; color: #26242b; line-height: 1.55; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; color: var(--accent); }
+  .lede { margin: 0 0 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  section { background: #fff; border: 1px solid #e0dfe5; border-radius: 8px; padding: 20px 22px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .hint { font-size: 0.9rem; color: #615d6b; margin: 0 0 14px; }
+  label { display: block; font-size: 0.9rem; margin: 10px 0 3px; }
+  input { width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid #c3c1cc; border-radius: 5px; font-family: inherit; }
+  button { margin-top: 16px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  button:hover { filter: brightness(1.15); }
+  .out { margin-top: 14px; font-size: 1rem; min-height: 1.4em; }
+  .out.err { color: #a32222; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; font-size: 0.85rem; color: #8b8894; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Incense math</h1>
+  <p class="lede">Burn time, room coverage and the yearly ritual. Exact arithmetic, every borrowed number labeled.</p>
+  <div class="grid">
+    <section>
+      <h2>Burn plan</h2>
+      <p class="hint">A stick becomes minutes.</p>
+      <label for="b-len">Stick length (cm)</label>
+      <input id="b-len" type="number" value="21" min="0" step="1">
+      <label for="b-rate">Burn rate (minutes per cm)</label>
+      <input id="b-rate" type="number" value="2" min="0" step="0.5">
+      <label for="b-pack">Sticks in the pack</label>
+      <input id="b-pack" type="number" value="20" min="0" step="1">
+      <button id="b-go">Time the burn</button>
+      <div class="out" id="b-out"></div>
+    </section>
+    <section>
+      <h2>Room plan</h2>
+      <p class="hint">A room becomes sticks a session.</p>
+      <label for="r-room">Room size (m²)</label>
+      <input id="r-room" type="number" value="30" min="0" step="1">
+      <label for="r-cover">Coverage per stick (m²)</label>
+      <input id="r-cover" type="number" value="15" min="0" step="1">
+      <label for="r-pack">Sticks in the pack</label>
+      <input id="r-pack" type="number" value="20" min="0" step="1">
+      <button id="r-go">Scent the room</button>
+      <div class="out" id="r-out"></div>
+    </section>
+    <section>
+      <h2>Year plan</h2>
+      <p class="hint">A ritual becomes a yearly cost.</p>
+      <label for="y-sess">Sessions a week</label>
+      <input id="y-sess" type="number" value="3" min="0" step="1">
+      <label for="y-sticks">Sticks a session</label>
+      <input id="y-sticks" type="number" value="2" min="0" step="1">
+      <label for="y-price">Pack price</label>
+      <input id="y-price" type="number" value="3" min="0" step="0.5">
+      <label for="y-size">Sticks in the pack</label>
+      <input id="y-size" type="number" value="20" min="0" step="1">
+      <button id="y-go">Count the year</button>
+      <div class="out" id="y-out"></div>
+    </section>
+  </div>
+</main>
+<footer>Built by the app factory. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/incensemath">Source</a></footer>
+<script src="engine.js"></script>
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function show(id, r, render){
+  var el = document.getElementById(id);
+  if (r.error) { el.textContent = r.error; el.classList.add('err'); }
+  else { el.textContent = render(r); el.classList.remove('err'); }
+}
+document.getElementById('b-go').addEventListener('click', function(){
+  show('b-out', IncenseMath.burnPlan(num('b-len'),num('b-rate'),num('b-pack')), function(r){ return IncenseMath.renderBurn(r, num('b-len'), num('b-rate'), num('b-pack')); });
+});
+document.getElementById('r-go').addEventListener('click', function(){
+  show('r-out', IncenseMath.roomPlan(num('r-room'),num('r-cover'),num('r-pack')), function(r){ return IncenseMath.renderRoom(r, num('r-room'), num('r-cover'), num('r-pack')); });
+});
+document.getElementById('y-go').addEventListener('click', function(){
+  show('y-out', IncenseMath.yearPlan(num('y-sess'),num('y-sticks'),num('y-price'),num('y-size')), function(r){ return IncenseMath.renderYear(r, num('y-sess'), num('y-sticks')); });
+});
+</script>
+</body>
+</html>
